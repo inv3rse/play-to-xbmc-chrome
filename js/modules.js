@@ -54,6 +54,23 @@ var DirectAudioLinkModule = {
     }
 };
 
+var GeneralFinderModule = {
+    canHandleUrl: function(url) {
+        // we lie here because we would need something async
+        return true;
+    },
+    getMediaType: function() {
+        return 'video';
+    },
+    getPluginPath: function(url, callback) {
+        chrome.tabs.sendMessage(currentTabId, {action: 'findMedia'}, function (response) {
+            if (response) {
+                callback(response);
+            }
+        });
+    }
+}
+
 var TorrentsLinkModule = {
     canHandleUrl: function(url) {
         var validPatterns = [
@@ -663,5 +680,8 @@ var allModules = [
     UrgantShowModule,
     KinoLiveModule,
     VesselLabModule,
-    Mp4UploadModule
+    Mp4UploadModule,
+
+    // use as a last resort
+    GeneralFinderModule
 ];

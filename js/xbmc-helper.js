@@ -16,7 +16,7 @@ function getSiteName(url) {
 function getPluginPath(url, callback) {
     if (debugLogsEnabled) console.log("Number of modules available: " + allModules.length);
     var foundModule = false;
-    for (var i = 0; i < allModules.length; i++) {
+    for (var i = 0; i < allModules.length  && !foundModule; i++) {
         var module = allModules[i];
         if (module.canHandleUrl(url)) {
             foundModule = true;

@@ -1,4 +1,58 @@
 var currentTabId;
+// store media content links for each tab
+var tabContentUrls = {};
+
+// clear the content links for a tab if the url changes or the tab is closed
+chrome.tabs.onUpdated.addListener(
+    function (tabId, changeInfo, tab) {
+        if (tabId in tabContentUrls)
+        {
+            delete tabContentUrls[tabId];
+        }
+    }
+)
+
+chrome.tabs.onRemoved.addListener(
+    function (tabId, removeInfo) {
+        if (tabId in tabContentUrls) {
+            delete tabContentUrls[tabId];
+        }
+    }
+)
+
+// listen for addUrl and getContentUrls requests
+chrome.runtime.onMessage.addListener(
+    function (message, sender, sendResponse) {
+        switch (message.action) {
+
+            // add a urls to the senders tabId
+            case 'addUrls':
+                if (message.media) {
+                    if (sender.tab.id in tabContentUrls) {
+                        for (var i = 0; i < message.media.length; i++) {
+                            if (tabContentUrls[sender.tab.id].indexOf(message.media[i]) == -1) {
+                                tabContentUrls[sender.tab.id].push(message.media[i]);
+                            }
+                        }
+                    }
+                    else {
+                        tabContentUrls[sender.tab.id] = message.media;
+                    }
+                }
+                break;
+
+            // get urls for the current tab
+            case 'getContentUrls':
+                chrome.tabs.getSelected(null, function (tab) {
+                    if (tab.id) {
+                        sendResponse(tabContentUrls[tab.id]);
+                    }
+                });
+                break;
+        }
+
+    }
+)
 
 chrome.extension.onMessage.addListener(
     function (request, sender, sendResponse) {

@@ -1,23 +1,31 @@
 function findMedia()
 {
-  var searchRegex = /((https|http):\/\/(www\.)?([^\s])+\.(mp4|avi|wmv|asf|flv|mkv|webm))/;
+  var searchRegex = /((((https|http):\/\/(www\.)?([^\s])+\.(mp4|avi|wmv|asf|flv|mkv|webm))(\?[a-zA-Z0-9\?&=]+)?)(\s|$|"|'))/;
   var found = $('*').html().match(searchRegex)
 
   if (found) {
-      return(found[0]);
+    content = []
+    content.push({
+      id: "myTestID1",
+      title: "foundVideo",
+      url: found[3]
+    });
+
+    if (found[2] != found[3]) {
+      content.push({
+        id: "myTestID2",
+        title: "foundVideo + Param",
+        url: found[2]
+      });
+    }
+
+    return content;
   }
 
   return null;
 }
 
-chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.action == "findMedia") {
-          var link = findMedia();
-          // if we do not find something do not answer to give other frames a chance 
-          if (link) {
-            sendResponse(link);
-          }
-        }
-    }
-);
+var media = findMedia();
+if (media) {
+  chrome.runtime.sendMessage({action: 'addUrls', media: media});
+}

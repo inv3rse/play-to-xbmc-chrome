@@ -441,12 +441,10 @@ function initVideoButton() {
 }
 
 function getEmbeddedVideos(callback) {
-    chrome.tabs.getSelected(null, function (tab) {
-        chrome.tabs.sendMessage(tab.id, {action: 'getEmbeddedVideos'}, function (response) {
-            if (response && response.length > 0) {
-                callback(response);
-            }
-        });
+    chrome.runtime.sendMessage({action: 'getContentUrls'}, function (response) {
+        if (response && response.length > 0) {
+            callback(response);
+        }
     });
 }
 

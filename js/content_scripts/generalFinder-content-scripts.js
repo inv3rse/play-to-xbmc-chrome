@@ -8,14 +8,14 @@ function findMedia()
     content.push({
       id: "myTestID1",
       title: "foundVideo",
-      url: found[3]
+      url: found[2]
     });
 
     if (found[2] != found[3]) {
       content.push({
         id: "myTestID2",
-        title: "foundVideo + Param",
-        url: found[2]
+        title: "foundVideo - Param",
+        url: found[3]
       });
     }
 

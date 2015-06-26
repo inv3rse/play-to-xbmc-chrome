@@ -76,6 +76,22 @@ var TorrentsLinkModule = {
     }
 };
 
+var AllMyVideosModule = {
+    // Depends on the 'generalFinder-content-scripts.js' to find the url
+    canHandleUrl: function(url) {
+        var validPatterns = [
+            ".*allmyvideos.net.+\\?v2"
+        ];
+        return urlMatchesOneOfPatterns(url, validPatterns);
+    },
+    getMediaType: function() {
+        return 'video';
+    },
+    getPluginPath: function(url, callback) {
+        callback(url + "&direct=false");
+    }
+};
+
 var AnimeLabModule = {
     canHandleUrl: function(url) {
         var validPatterns = [
@@ -663,5 +679,6 @@ var allModules = [
     UrgantShowModule,
     KinoLiveModule,
     VesselLabModule,
-    Mp4UploadModule
+    Mp4UploadModule,
+    AllMyVideosModule
 ];

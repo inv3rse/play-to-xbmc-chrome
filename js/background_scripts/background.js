@@ -26,18 +26,23 @@ chrome.runtime.onMessage.addListener(
         switch (message.action) {
 
             // add a urls to the senders tabId
+            // message format: {action: 'addUrls', media: [{id: "someId", title: "videoTitle", url: "http:..."}, ...]}
             case 'addUrls':
+
                 if (message.media) {
-                    if (sender.tab.id in tabContentUrls) {
-                        for (var i = 0; i < message.media.length; i++) {
-                            if (tabContentUrls[sender.tab.id].indexOf(message.media[i]) == -1) {
-                                tabContentUrls[sender.tab.id].push(message.media[i]);
-                            }
+
+                    if (!(sender.tab.id in tabContentUrls)) {
+                        tabContentUrls[sender.tab.id] = [];
+                    }
+
+                    for (var i = 0; i < message.media.length; i++) {
+                        if (message.media[i].url && validUrl(message.media[i].url) && 
+                            tabContentUrls[sender.tab.id].indexOf(message.media[i]) == -1) 
+                        {
+                            tabContentUrls[sender.tab.id].push(message.media[i]);
                         }
-                    }
-                    else {
-                        tabContentUrls[sender.tab.id] = message.media;
-                    }
+                    }                    
+                    
                 }
                 break;
 
@@ -53,6 +58,7 @@ chrome.runtime.onMessage.addListener(
 
     }
 )
+
 
 chrome.extension.onMessage.addListener(
     function (request, sender, sendResponse) {

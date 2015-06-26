@@ -1,17 +1,7 @@
-
-chrome.extension.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.action == "getEmbeddedVideos") {
-            sendResponse(videoList);
-        }
-    }
-);
-
-var videoList = [];
 getEmbeddedVideos();
 
-function getEmbeddedVideos(callback) {
-    videoList = [];
+function getEmbeddedVideos() {
+    var videoList = [];
     var videoIdList = [];
 
     var $iframes = $('iframe[src*="youtube.com/embed"]');
@@ -44,8 +34,8 @@ function getEmbeddedVideos(callback) {
             });
         }
 
-        if (callback) {
-            callback(videoList);
+        if (videoList.length > 0) {
+            chrome.runtime.sendMessage({action: 'addUrls', media: videoList});
         }
     });
 }

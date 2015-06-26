@@ -5,7 +5,7 @@ var tabContentUrls = {};
 // clear the content links for a tab if the url changes or the tab is closed
 chrome.tabs.onUpdated.addListener(
     function (tabId, changeInfo, tab) {
-        if (tabId in tabContentUrls)
+        if (tabId in tabContentUrls && tab.url != tabContentUrls[tabId].tabUrl)
         {
             delete tabContentUrls[tabId];
         }
@@ -32,14 +32,15 @@ chrome.runtime.onMessage.addListener(
                 if (message.media) {
 
                     if (!(sender.tab.id in tabContentUrls)) {
-                        tabContentUrls[sender.tab.id] = [];
+                        tabContentUrls[sender.tab.id] = {tabUrl: sender.tab.url, media: []};
                     }
 
                     for (var i = 0; i < message.media.length; i++) {
-                        if (message.media[i].url && validUrl(message.media[i].url) && 
-                            tabContentUrls[sender.tab.id].indexOf(message.media[i]) == -1) 
+                        if (message.media[i].url 
+                            && !mediaAlreadyInList(sender.tab.id, message.media[i]) 
+                            && validUrl(message.media[i].url)) 
                         {
-                            tabContentUrls[sender.tab.id].push(message.media[i]);
+                            tabContentUrls[sender.tab.id].media.push(message.media[i]);
                         }
                     }                    
                     
@@ -49,8 +50,11 @@ chrome.runtime.onMessage.addListener(
             // get urls for the current tab
             case 'getContentUrls':
                 chrome.tabs.getSelected(null, function (tab) {
-                    if (tab.id) {
-                        sendResponse(tabContentUrls[tab.id]);
+                    if (tab.id && tab.id in tabContentUrls) {
+                        sendResponse(tabContentUrls[tab.id].media);
+                    }
+                    else {
+                        sendResponse([]);
                     }
                 });
                 break;
@@ -59,6 +63,15 @@ chrome.runtime.onMessage.addListener(
     }
 )
 
+function mediaAlreadyInList(tabId, mediaContent) {
+    for (var i = 0; i < tabContentUrls[tabId].media.length; i++) {
+        if (tabContentUrls[tabId].media[i].url == mediaContent.url) {
+            return true;
+        }
+    };
+
+    return false;
+}
 
 chrome.extension.onMessage.addListener(
     function (request, sender, sendResponse) {

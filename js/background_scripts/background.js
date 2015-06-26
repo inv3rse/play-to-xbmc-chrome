@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener(
 
 function mediaAlreadyInList(tabId, mediaContent) {
     for (var i = 0; i < tabContentUrls[tabId].media.length; i++) {
-        if (tabContentUrls[tabId].media[i].url == mediaContent.url) {
+        if (tabContentUrls[tabId].media[i].id == mediaContent.id) {
             return true;
         }
     };
@@ -75,7 +75,13 @@ function mediaAlreadyInList(tabId, mediaContent) {
 
 chrome.extension.onMessage.addListener(
     function (request, sender, sendResponse) {
-        if (request.tabId) currentTabId = request.tabId;
+        if (request.tabId) {
+            currentTabId = request.tabId;
+        }
+        else if (sender.tab && sender.tab.id) {
+            currentTabId = sender.tab.id;
+        }
+        
         switch (request.action) {
             case 'isAvailable':
                 getXbmcJsonVersion(function (version) {
@@ -88,7 +94,6 @@ chrome.extension.onMessage.addListener(
                 break;
 
             case 'playThis':
-                currentTabId = request.tabId;
                 chrome.tabs.sendMessage(currentTabId, {action: 'onPlayback'});
                 playThisUrl(request.url, function() {
                     sendResponse({response: "OK"});

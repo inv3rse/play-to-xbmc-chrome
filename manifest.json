@@ -32,6 +32,10 @@
         ],
         "all_frames": true
     }, {
+        "matches": ["*://allmyvideos.net/embed-*"],
+        "js": ["js/content_scripts/allmyVideos-content-scripts.js", "js/jquery-2.1.4.min.js"],
+        "all_frames": true
+    }, {
         "matches": ["http://www.liveleak.com/view*"],
         "js": ["js/content_scripts/liveleak-content-scripts.js", "js/jquery-2.1.4.min.js"]
     }, {
